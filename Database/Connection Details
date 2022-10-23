@@ -1,2 +1,5 @@
+Endpoint : fypdatabase.cynv7wgaxvab.ap-northeast-1.rds.amazonaws.com
 Master Username : fypAAMS
 Master Password : fast1234
+Port : 3306
+Software : MySQL Workbench
