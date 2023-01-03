@@ -1,4 +1,12 @@
-import mysql.connector
+from google.colab import drive
+drive.mount('/content/drive')
+
+import zipfile
+import os
+zip_ref = zipfile.ZipFile('/content/drive/MyDrive/train.zip','r')
+zip_ref.extractall('/tmp')
+zip_ref.close()
+len(os.listdir('/tmp/train/'))
 
 def convertToBinaryData(filename):
     # Convert digital data to binary format
