@@ -136,3 +136,9 @@ CREATE TABLE `sections` (
 
 
 -- --------------------------------------------------------
+
+-- Notes (TO DO):
+-- 1. Merge coursse_semester and coursse_department
+-- 2. Add identifiers to sections
+-- 3. Optimize sections table (C,D,Identifier)
+-- 4. Search how to find which student belongs to which sections
