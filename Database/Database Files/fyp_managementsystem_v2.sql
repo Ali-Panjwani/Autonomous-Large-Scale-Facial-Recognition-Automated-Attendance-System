@@ -5,9 +5,9 @@
 -- student_course +
 -- Department +
 -- Encodings 
--- Sections
+-- Sections +
 -- Student +
--- Faculty
+-- Faculty +
 
 
 -- New Tables Added
