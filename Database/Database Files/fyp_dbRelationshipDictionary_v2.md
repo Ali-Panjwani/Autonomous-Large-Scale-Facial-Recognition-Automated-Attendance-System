@@ -31,4 +31,4 @@ section_teacher:
 The section_teacher table establishes a many-to-many relationship between the faculty and sections tables. It contains the foreign keys SEC_ID and F_ID referencing the sections and Faculty tables, respectively.
 
 department_incharge:
-The department_incharge table establishes a one-to-one relationship between the Department and Faculty tables. It contains the foreign keys D_ID and F_ID referencing the Department and Faculty tables, respectively.
+The department_incharge table establishes a one-to-one relationship between the Department and Faculty tables. It contains the foreign keys D_ID and F_ID referencing the Department and Faculty tables, respectively. 
