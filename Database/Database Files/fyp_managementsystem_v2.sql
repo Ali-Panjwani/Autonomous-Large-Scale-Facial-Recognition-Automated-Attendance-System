@@ -29,6 +29,7 @@ CREATE TABLE `student` (
   `phone_No` varchar(20) NOT NULL,
   `DOB` date NOT NULL,
   `Gender` enum('M','F','O') NOT NULL,
+  `password` varchar(50) NOT NULL,
   `D_ID` int(3) NOT NULL,
   PRIMARY KEY (`roll_Number`),
   KEY `D_ID` (`D_ID`),
