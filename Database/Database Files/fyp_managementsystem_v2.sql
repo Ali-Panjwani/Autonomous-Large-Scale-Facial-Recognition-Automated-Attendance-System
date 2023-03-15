@@ -4,15 +4,16 @@
 -- course +
 -- student_course +
 -- Department +
--- Encodings 
+-- Encodings +
 -- Sections +
 -- Student +
 -- Faculty +
 
 
 -- New Tables Added
--- course_semester
--- course_department
+-- course_info (Course,Department,Semester)
+-- section_teacher (teacher of each section)
+-- department_incharge (HOD)
 
 
 
@@ -42,12 +43,8 @@ CREATE TABLE `department` (
   `D_ID` int(3) NOT NULL,
   `Name` char(30) NOT NULL,
   `Desc` text NOT NULL,
-  `Incharge` int(5) DEFAULT NULL,
-  PRIMARY KEY (`D_ID`),
-  KEY `Incharge` (`Incharge`),
-  CONSTRAINT `department_ibfk_1` FOREIGN KEY (`Incharge`) REFERENCES `faculty` (`F_ID`)
+  PRIMARY KEY (`D_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 
 -- --------------------------------------------------------
 
@@ -64,25 +61,15 @@ CREATE TABLE `course` (
 
 -- --------------------------------------------------------
 
--- Table structure for table `course_department`
+-- Table structure for table `course_info`
 
-CREATE TABLE `course_department` (
+CREATE TABLE `course_info` (
   `C_ID` varchar(5) NOT NULL,
   `D_ID` int(3) NOT NULL,
-  PRIMARY KEY (`C_ID`, `D_ID`),
-  FOREIGN KEY (`C_ID`) REFERENCES `course` (`C_ID`),
-  FOREIGN KEY (`D_ID`) REFERENCES `department` (`D_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
--- Table structure for table `course_semester`
-
-CREATE TABLE `course_semester` (
-  `C_ID` varchar(5) NOT NULL,
   `Semester` int(1) NOT NULL,
-  PRIMARY KEY (`C_ID`, `Semester`),
+  PRIMARY KEY (`C_ID`, `D_ID`, `Semester`),
   FOREIGN KEY (`C_ID`) REFERENCES `course` (`C_ID`),
+  FOREIGN KEY (`D_ID`) REFERENCES `department` (`D_ID`),
   FOREIGN KEY (`Semester`) REFERENCES `semester` (`Semester`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -93,14 +80,13 @@ CREATE TABLE `course_semester` (
 CREATE TABLE `student_course` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `roll_Number` varchar(7) NOT NULL,
-  `C_ID` varchar(5) NOT NULL,
+  `SEC_ID` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_student_course_student` (`roll_Number`),
-  KEY `fk_student_course_course` (`C_ID`),
-  CONSTRAINT `fk_student_course_course` FOREIGN KEY (`C_ID`) REFERENCES `course` (`C_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  KEY `fk_student_course_section` (`SEC_ID`),
+  CONSTRAINT `fk_student_course_section` FOREIGN KEY (`SEC_ID`) REFERENCES `sections` (`SEC_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_student_course_student` FOREIGN KEY (`roll_Number`) REFERENCES `student` (`roll_Number`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 
 -- --------------------------------------------------------
 
@@ -122,23 +108,59 @@ CREATE TABLE `faculty` (
 -- Table structure for table `sections`
 
 CREATE TABLE `sections` (
-  `S_ID` int(11) NOT NULL AUTO_INCREMENT,
-  `C_ID` varchar(5) NOT NULL,
-  `D_ID` int(3) NOT NULL,
-  `Semester` int(1) NOT NULL,
-  `Section` char(1) NOT NULL,
+  `SEC_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `course_info` int(11) NOT NULL,
+  `section_identifier` char(1) NOT NULL,
+  PRIMARY KEY (`SEC_ID`),
+  FOREIGN KEY (`course_info`) REFERENCES `course_info`(`course_info_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+-- Table structure for table `section_teacher`
+
+CREATE TABLE `section_teacher` (
+  `SEC_ID` int(11) NOT NULL,
   `F_ID` int(5) NOT NULL,
-  PRIMARY KEY (`S_ID`),
-  FOREIGN KEY (`C_ID`) REFERENCES `courses`(`C_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (`D_ID`) REFERENCES `departments`(`D_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (`SEC_ID`, `F_ID`),
+  FOREIGN KEY (`SEC_ID`) REFERENCES `sections`(`SEC_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (`F_ID`) REFERENCES `faculty`(`F_ID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+-- Table structure for table `encodings`
+
+CREATE TABLE `encodings` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `roll_number` varchar(7) NOT NULL,
+  `encoding` varbinary NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`roll_number`) REFERENCES `student` (`roll_number`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+-- Table structure for table `department_incharge`
+
+CREATE TABLE `department_incharge` (
+  `D_ID` int(3) NOT NULL,
+  `F_ID` int(5) NOT NULL,
+  PRIMARY KEY (`D_ID`),
+  FOREIGN KEY (`D_ID`) REFERENCES `department` (`D_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`F_ID`) REFERENCES `faculty` (`F_ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 -- --------------------------------------------------------
 
--- Notes (TO DO):
--- 1. Merge coursse_semester and coursse_department
--- 2. Add identifiers to sections
--- 3. Optimize sections table (C,D,Identifier)
--- 4. Search how to find which student belongs to which sections
+-- Table structure for table `department_incharge`
+
+CREATE TABLE `attendance` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date` date NOT NULL,
+  `S_ID` int(11) NOT NULL,
+  `is_present` boolean NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`S_ID`) REFERENCES `student_course`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
