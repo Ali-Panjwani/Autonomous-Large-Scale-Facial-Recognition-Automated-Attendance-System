@@ -154,7 +154,7 @@ CREATE TABLE `department_incharge` (
 
 -- --------------------------------------------------------
 
--- Table structure for table `department_incharge`
+-- Table structure for table `attendance`
 
 CREATE TABLE `attendance` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
