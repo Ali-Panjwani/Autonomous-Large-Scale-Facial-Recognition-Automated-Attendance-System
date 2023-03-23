@@ -101,6 +101,7 @@ CREATE TABLE `faculty` (
   `phone_No` int(11) NOT NULL,
   `Gender` char(1) NOT NULL,
   `DOB` date NOT NULL,
+  `email` text NOT NULL,
   PRIMARY KEY (`F_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -110,11 +111,14 @@ CREATE TABLE `faculty` (
 
 CREATE TABLE `sections` (
   `SEC_ID` int(11) NOT NULL AUTO_INCREMENT,
-  `course_info` int(11) NOT NULL,
+  `C_ID` varchar(5) NOT NULL,
+  `D_ID` int(3) NOT NULL,
+  `Semester` int(1) NOT NULL,
   `section_identifier` char(1) NOT NULL,
   PRIMARY KEY (`SEC_ID`),
-  FOREIGN KEY (`course_info`) REFERENCES `course_info`(`course_info_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (`C_ID`, `D_ID`, `Semester`) REFERENCES `course_info`(`C_ID`, `D_ID`, `Semester`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 -- --------------------------------------------------------
 
@@ -147,7 +151,7 @@ CREATE TABLE `encodings` (
 CREATE TABLE `department_incharge` (
   `D_ID` int(3) NOT NULL,
   `F_ID` int(5) NOT NULL,
-  PRIMARY KEY (`D_ID`),
+  PRIMARY KEY (`D_ID`, `F_ID`),
   FOREIGN KEY (`D_ID`) REFERENCES `department` (`D_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (`F_ID`) REFERENCES `faculty` (`F_ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -164,4 +168,37 @@ CREATE TABLE `attendance` (
   `is_present` boolean NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`S_ID`) REFERENCES `student_course`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+-- Table structure for table `wrong_attendance`
+
+CREATE TABLE `wrong_attendance` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `S_ID` int(11) NOT NULL,
+  `SEC_ID` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `requested_date` date NOT NULL,
+  `reason` text NOT NULL,
+  `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`S_ID`) REFERENCES `student`(`S_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`SEC_ID`) REFERENCES `sections`(`SEC_ID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+-- Table structure for table `email`
+
+CREATE TABLE `email` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sender` varchar(7) NOT NULL,
+  `recipient` int(5) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `body` text NOT NULL,
+  `date_sent` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`sender`) REFERENCES `student`(`roll_number`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`recipient`) REFERENCES `faculty`(`F_ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
