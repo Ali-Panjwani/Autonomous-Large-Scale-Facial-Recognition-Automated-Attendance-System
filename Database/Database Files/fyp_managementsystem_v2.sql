@@ -43,7 +43,7 @@ CREATE TABLE `student` (
 -- Table structure for table `department`
 
 CREATE TABLE `department` (
-  `D_ID` int(3) NOT NULL,
+  `D_ID` int(3) NOT NULL AUTO_INCREMENT,
   `Name` char(30) NOT NULL,
   `Desc` text NOT NULL,
   PRIMARY KEY (`D_ID`)
@@ -54,7 +54,7 @@ CREATE TABLE `department` (
 -- Table structure for table `course`
 
 CREATE TABLE `course` (
-  `C_ID` varchar(5) NOT NULL,
+  `C_ID` varchar(5) NOT NULL AUTO_INCREMENT,
   `Name` char(30) NOT NULL,
   `Desc` text NOT NULL,
   `Credits` int(2) NOT NULL,
