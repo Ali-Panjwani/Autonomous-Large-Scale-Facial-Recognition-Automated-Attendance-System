@@ -1,19 +1,21 @@
 
 -- Table Names
--- Attendance 
--- course +
--- student_course +
--- Department +
--- Encodings +
--- Sections +
--- Student +
--- Faculty +
+---- Attendance 
+---- course
+---- student_course
+---- Department
+---- Encodings
+---- Sections
+---- Student
+---- Faculty
 
 
 -- New Tables Added
--- course_info (Course,Department,Semester)
--- section_teacher (teacher of each section)
--- department_incharge (HOD)
+---- course_info (Course,Department,Semester)
+---- section_teacher (teacher of each section)
+---- department_incharge (HOD)
+---- wrong_attendance
+---- email
 
 
 
