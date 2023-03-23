@@ -185,7 +185,7 @@ CREATE TABLE `wrong_attendance` (
   `reason` text NOT NULL,
   `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`S_ID`) REFERENCES `student`(`S_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`S_ID`) REFERENCES `student`(`roll_number`) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (`SEC_ID`) REFERENCES `sections`(`SEC_ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
