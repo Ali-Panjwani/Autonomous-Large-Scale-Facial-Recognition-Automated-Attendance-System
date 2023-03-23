@@ -24,7 +24,7 @@
 -- Table structure for table `student`
 
 CREATE TABLE `student` (
-  `roll_Number` varchar(7) NOT NULL,
+  `roll_Number` varchar(7) UNIQUE NOT NULL,
   `Name` char(30) NOT NULL,
   `Address` text NOT NULL,
   `CNIC` int(13) NOT NULL,
@@ -99,9 +99,9 @@ CREATE TABLE `faculty` (
   `F_ID` int(5) NOT NULL,
   `Name` char(30) NOT NULL,
   `Address` text NOT NULL,
-  `CNIC` int(13) NOT NULL,
+  `CNIC` char(15) UNIQUE NOT NULL,
   `phone_No` int(11) NOT NULL,
-  `Gender` char(1) NOT NULL,
+  `Gender` enum('M', 'F', 'O') NOT NULL,
   `DOB` date NOT NULL,
   `email` text NOT NULL,
   PRIMARY KEY (`F_ID`)
