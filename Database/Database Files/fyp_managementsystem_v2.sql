@@ -1,21 +1,21 @@
 
 -- Table Names
----- Attendance 
----- course
----- student_course
----- Department
----- Encodings
----- Sections
----- Student
----- Faculty
+-- -- Attendance 
+-- -- course
+-- -- student_course
+-- -- Department
+-- -- Encodings
+-- -- Sections
+-- -- Student
+-- -- Faculty
 
 
 -- New Tables Added
----- course_info (Course,Department,Semester)
----- section_teacher (teacher of each section)
----- department_incharge (HOD)
----- wrong_attendance
----- email
+-- -- course_info (Course,Department,Semester)
+-- -- section_teacher (teacher of each section)
+-- -- department_incharge (HOD)
+-- -- wrong_attendance
+-- -- email
 
 
 
@@ -141,7 +141,7 @@ CREATE TABLE `section_teacher` (
 CREATE TABLE `encodings` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `roll_number` varchar(7) NOT NULL,
-  `encoding` varbinary NOT NULL,
+  `encoding` varbinary(65535) NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`roll_number`) REFERENCES `student` (`roll_number`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
