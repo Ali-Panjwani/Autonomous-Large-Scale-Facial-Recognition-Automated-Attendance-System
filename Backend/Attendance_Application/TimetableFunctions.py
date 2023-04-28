@@ -9,7 +9,7 @@ def getToday():
 
 def getTodayTimetable():
     today = getToday()
-    timetable = "./Timetable/FAST School of Computing.xlsx"
+    timetable = "../Timetable/FAST School of Computing.xlsx"
     return pd.read_excel(timetable, sheet_name=today)
 
 
