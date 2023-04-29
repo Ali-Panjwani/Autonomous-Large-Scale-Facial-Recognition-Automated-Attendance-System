@@ -58,6 +58,7 @@ def getStudentsBySection():
     '/getStudentInfo',
     methods=['GET'])
 def getStudentInfo():
-    roll_number_args = request.args.get('rollNumber')
-    password_args = request.args.get('password')
+    data = request.get_json()
+    roll_number_args = data['rollNumber']
+    password_args = data['password']
     return getStudentInfoFunction(roll_number_args, password_args), {"Content-Type": "application/json"}
