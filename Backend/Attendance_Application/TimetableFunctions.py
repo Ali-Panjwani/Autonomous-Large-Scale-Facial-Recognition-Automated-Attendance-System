@@ -1,5 +1,6 @@
 import pandas as pd
 import re
+import os
 from datetime import datetime, time
 from Backend.Classes import Section
 
@@ -89,8 +90,17 @@ def getSlots():
     return slots
 
 
-#def makeVenues()
+def makeVenues():
 
+    class_cams_location = './Class_Cams'
+    if not os.path.exists(class_cams_location):
+        os.mkdir(class_cams_location)
+
+
+    for venue in getVenues():
+        class_location = '/' + venue[0] + '_' + venue[1]
+        if not os.path.exists(class_cams_location + class_location):
+            os.mkdir(class_cams_location + class_location)
 
 
 def changeDegreeName(name):
