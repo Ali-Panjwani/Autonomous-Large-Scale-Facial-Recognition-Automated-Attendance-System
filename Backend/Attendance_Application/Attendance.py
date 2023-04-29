@@ -11,7 +11,7 @@ start = time.time()
 
 AllStudentsList = ['K190365', 'K191289', 'K191251', 'K191251', 'Mubashir', 'Shakoor', 'Shubair', 'Haris']
 
-filepath = 'C:\\Users\\ALI\\Desktop\\fyp_dataset\\data'
+filepath = 'E:\\Repository\\FYP\\Database\\fyp_dataset\\data'
 
 images, facelabels = AttFunc.getAllStudentsImage(filepath, AllStudentsList)
 
@@ -20,7 +20,7 @@ facematrix = np.array([img.flatten() for img in images])
 knn = KNeighborsClassifier()
 
 # Load the test image
-test_img = cv2.imread("C:\\Users\\ALI\\Desktop\\fyp_dataset\\test1.jpg", cv2.IMREAD_GRAYSCALE)
+test_img = cv2.imread("E:\\Repository\\FYP\\Database\\fyp_dataset\\test.jpg", cv2.IMREAD_GRAYSCALE)
 
 # Detect all faces in the test image
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
