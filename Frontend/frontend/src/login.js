@@ -1,97 +1,34 @@
-import React, { useState } from "react";
-import ReactDOM from "react-dom";
-import "./login-css.css";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-
-function Login() {
-  // React States
-  const [errorMessages, setErrorMessages] = useState({});
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  // User Login info
-  const database = [
-    {
-      username: "user1",
-      password: "pass1"
-    },
-    {
-      username: "user2",
-      password: "pass2"
-    }
-  ];
-
-  const errors = {
-    uname: "invalid username",
-    pass: "invalid password"
-  };
-
+function LoginPage() {
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
+const navigate = useNavigate();
   const handleSubmit = (event) => {
-    //Prevent page reload
-    event.preventDefault();
+    event.preventDefault(); // Prevents default form submission behavior
 
-    var { uname, pass } = document.forms[0];
+    // TODO: Call your authentication API with the name and password entered by the user
+    console.log(`Name: ${name} Password: ${password}`);
+    navigate('/dash');
 
-    // Find user login info
-    const userData = database.find((user) => user.username === uname.value);
-
-    // Compare user info
-    if (userData) {
-      if (userData.password !== pass.value) {
-        // Invalid password
-        setErrorMessages({ name: "pass", message: errors.pass });
-      } else {
-        setIsSubmitted(true);
-      }
-    } else {
-      // Username not found
-      setErrorMessages({ name: "uname", message: errors.uname });
-    }
   };
 
-  // Generate JSX code for error message
-  const renderErrorMessage = (name) =>
-    name === errorMessages.name && (
-      <div className="error">{errorMessages.message}</div>
-    );
-
-  // JSX code for login form
-  const renderForm = (
-    <div className="form">
-      <form onSubmit={handleSubmit}>
-        <div className="input-container">
-          <label>Username </label>
-          <input type="text" name="uname" required />
-          {renderErrorMessage("uname")}
-        </div>
-        <div className="input-container">
-          <label>Password </label>
-          <input type="password" name="pass" required />
-          {renderErrorMessage("pass")}
-        </div>
-        <div className="button-container">
-          <input type="submit" />
-        </div>
-      </form>
-    </div>
-  );
-
   return (
-    <div className="login-form">
-      <div className="title">Log In</div>
-      {isSubmitted ? <div>User is successfully logged in</div> : renderForm}
-    </div>
+    <form onSubmit={handleSubmit}>
+      <label>
+        Name:
+        <input type="text" value={name} onChange={(event) => setName(event.target.value)} />
+      </label>
+      <br />
+      <label>
+        Password:
+        <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
+      </label>
+      <br />
+      <button type="submit">Submit</button>
+    </form>
   );
 }
 
-function App() {
-  return (
-    <div className="app">
-    <h1> FAST NUCES </h1>
-    <h2> Student Portal </h2>
-
-      <Login />
-    </div>
-  );
-}
-
-export default App;
+export default LoginPage;
