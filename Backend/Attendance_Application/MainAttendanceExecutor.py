@@ -7,6 +7,7 @@ timetable = tf.getTodayTimetable()
 start_time = tf.todayStartTime()
 end_time = tf.todayEndTime()
 venues = tf.getVenues()
+slots = tf.getSlots()
 time_difference = datetime.combine(datetime.today(), start_time) - datetime.combine(datetime.today(), datetime.now().time())
 
 if test == 0:
