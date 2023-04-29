@@ -75,6 +75,24 @@ def getVenues():
 
     return formatted_venues
 
+def getSlots():
+    timetable = getTodayTimetable()
+
+    slots = timetable.loc[timetable['Slots'] == 'Slots']
+
+    # Extract all numeric values from the row and store them in a list
+    slots = slots.columns.tolist()
+
+    # Removing Slots word from the list
+    del slots[0:1]
+
+    return slots
+
+
+#def makeVenues()
+
+
+
 def changeDegreeName(name):
     if name == "BCS":
         name = "CS"
@@ -89,8 +107,6 @@ def changeDegreeName(name):
 
     return name
 
-
-#def makeSectionIfNot()
 
 
 def extractSemesterAndSection(string):
@@ -114,7 +130,7 @@ def getSectionsOfSlot(slot):
     timetable = getTodayTimetable()
 
     unformatted_slots = timetable[slot].tolist()
-    unformatted_slots.remove(unformatted_slots[0])
+    del unformatted_slots[0:2]
 
     extra_word_to_remove_list = ["Venues/time", "CLASSROOMS", "LABS", "RESERVED FOR EE"]
 
