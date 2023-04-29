@@ -1,5 +1,6 @@
 import json
 from flask import Flask, request
+from flask_cors import CORS
 from collections import OrderedDict
 import Backend.reasonCodeAndMessages as rcm
 from Backend.Attendance_Application.GetStudentsBySectionFile import getStudentsBySectionFunction
@@ -9,6 +10,8 @@ Attendance_app = Flask(__name__)
 Student_app = Flask(__name__)
 Admin_app = Flask(__name__)
 
+CORS(Student_app)
+CORS(Admin_app)
 
 @Attendance_app.route("/")
 def attendanceAppRunning():
