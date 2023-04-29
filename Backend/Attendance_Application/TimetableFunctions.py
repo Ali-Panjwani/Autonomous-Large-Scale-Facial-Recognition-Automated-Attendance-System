@@ -1,6 +1,7 @@
 import pandas as pd
 import re
 import os
+import Backend.dbconnector as dbc
 from datetime import datetime, time
 from Backend.Classes import Section
 
@@ -90,7 +91,7 @@ def getSlots():
     return slots
 
 
-def makeVenues():
+def setVenues():
 
     class_cams_location = './Class_Cams'
     if not os.path.exists(class_cams_location):
@@ -180,3 +181,49 @@ def getSectionsOfSlot(slot):
             formatted_slots.append(temp_list)
 
     return formatted_slots
+
+
+def setCourseDetailsAndSections(formatted_slots):
+    conn = dbc.connect_db()
+    cursor = conn.cursor()
+
+    formatted_slots = set(tuple(x) for x in formatted_slots if isinstance(x, list))
+
+    for value in formatted_slots :
+        if not isinstance(value, float):
+
+            query = "INSERT INTO course_detail (`id`, `C_Name`, `D_Name`, `Semester`) " \
+                    "SELECT '' as id, '{course_name}' as C_Name, '{degree_name}' as D_Name, '{semester}' as Semester " \
+                    "FROM DUAL " \
+                    "WHERE NOT EXISTS ( " \
+                    "SELECT 1 " \
+                    "FROM course_detail " \
+                    "WHERE C_Name = '{course_name}' " \
+                    "AND D_Name = '{degree_name}' " \
+                    "AND Semester = '{semester}' )"
+
+
+            formatted_query = query.format(course_name= value[0], degree_name=value[1], semester=value[2])
+            cursor.execute(formatted_query)
+
+            query = "INSERT INTO `sections`(`SEC_ID`, `C_Name`, `D_Name`, `Semester`, `section_identifier`) " \
+                    "SELECT '' as SEC_ID, '{course_name}' as C_Name, '{degree_name}' as D_Name, '{semester}' as Semester, '{section}' as section_identifier " \
+                    "FROM DUAL " \
+                    "WHERE NOT EXISTS (" \
+                    "SELECT 1 " \
+                    "FROM `sections` " \
+                    "WHERE `C_Name` = '{course_name}' AND " \
+                    "`D_Name` = '{degree_name}' AND " \
+                    "`Semester` = '{semester}' AND " \
+                    "`section_identifier` = '{section}' )"
+
+
+
+            formatted_query = query.format(course_name=value[0], degree_name=value[1], semester=value[2], section=value[3])
+            cursor.execute(formatted_query)
+
+    conn.commit()
+    conn.close()
+
+
+# def getSectionByDetails(formatted_slots)

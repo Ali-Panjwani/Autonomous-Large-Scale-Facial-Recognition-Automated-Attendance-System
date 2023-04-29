@@ -7,7 +7,7 @@ timetable = tf.getTodayTimetable()
 start_time = tf.todayStartTime()
 end_time = tf.todayEndTime()
 venues = tf.getVenues()
-tf.makeVenues()
+tf.setVenues()
 slots = tf.getSlots()
 time_difference = datetime.combine(datetime.today(), start_time) - datetime.combine(datetime.today(), datetime.now().time())
 
@@ -16,4 +16,4 @@ if test == 0:
         time.sleep(time_difference.total_seconds() + 120)
 
 slot = 1
-tf.getSectionsOfSlot(1)
+tf.setCourseDetailsAndSections(tf.getSectionsOfSlot(1))
