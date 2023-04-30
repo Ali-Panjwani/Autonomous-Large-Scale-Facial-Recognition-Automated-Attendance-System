@@ -16,4 +16,6 @@ if test == 0:
         time.sleep(time_difference.total_seconds() + 120)
 
 slot = 1
-tf.setCourseDetailsAndSections(tf.getSectionsOfSlot(1))
+section_details_list = tf.getSectionsOfSlot(1)
+section_list = tf.getSectionByDetails(section_details_list)
+print(section_list)

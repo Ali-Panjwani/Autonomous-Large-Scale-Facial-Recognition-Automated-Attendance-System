@@ -226,4 +226,32 @@ def setCourseDetailsAndSections(formatted_slots):
     conn.close()
 
 
-# def getSectionByDetails(formatted_slots)
+def getSectionByDetails(formatted_slots):
+    conn = dbc.connect_db()
+    cursor = conn.cursor()
+    section_list = []
+
+    for value in formatted_slots:
+        if not isinstance(value, float):
+
+            query = "SELECT SEC_ID " \
+                    "FROM sections " \
+                    "WHERE `C_Name` = '{course_name}' AND `D_Name` = '{degree_name}' AND `Semester` = '{semester}' AND `section_identifier` = '{section}'"
+
+            formatted_query = query.format(course_name=value[0], degree_name=value[1], semester=value[2], section=value[3])
+            cursor.execute(formatted_query)
+            section = cursor.fetchone()
+            section_list.append(section)
+
+        else:
+            section_list.append(value)
+
+    conn.close()
+
+    section_list = [str(item) for item in section_list]
+    section_list = [section.replace('(', '').replace(')', '').replace(',', '') for section in section_list]
+
+    return section_list
+
+
+# def markAttendance(venues, section_list)
