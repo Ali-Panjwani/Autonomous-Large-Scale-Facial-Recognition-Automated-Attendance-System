@@ -9,7 +9,7 @@ def getAllStudentsImage(filepath, AllStudentsList):
     images = []
     facelabel = []
 
-    for i in os.listdir(filepath):
+    for i in os.listdir(AllStudentsList):
         for j in os.listdir(filepath + "\\" + i):
             img = cv2.imread(os.path.join(filepath, i, j), cv2.IMREAD_GRAYSCALE)
             img = cv2.resize(img, (128, 128))

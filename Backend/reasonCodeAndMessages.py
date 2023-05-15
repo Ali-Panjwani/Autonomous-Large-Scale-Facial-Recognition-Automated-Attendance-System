@@ -40,6 +40,9 @@ course_not_exists_message = "No Course Found"
 attendance_not_exists_code = "08"
 attendance_not_exists_message = "No Attendance Found"
 
+no_student_in_section_code = "09"
+no_student_in_section_message = "No Students Found In Section"
+
 
 def getReasonCodeAndMessage(code, message):
     return OrderedDict([(reason_code, code), (reason_message, message)])

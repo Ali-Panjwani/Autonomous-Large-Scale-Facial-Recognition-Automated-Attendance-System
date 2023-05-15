@@ -3,7 +3,8 @@ import re
 import os
 import Backend.dbconnector as dbc
 from datetime import datetime, time
-from Backend.Classes import Section
+import AttendanceMarker as am
+import Backend.reasonCodeAndMessages as rcm
 
 test = 1
 
@@ -126,6 +127,8 @@ def extractSemesterAndSection(string):
 
     # Remove any remaining brackets
     string = string.replace('(', '').replace(')', '')
+    if len(string) > 2:
+        string = string[:2]
 
     semester = ''
     section = ''
@@ -231,20 +234,34 @@ def getSectionByDetails(formatted_slots):
     cursor = conn.cursor()
     section_list = []
 
+    occurred_values = set()
+
     for value in formatted_slots:
         if not isinstance(value, float):
 
-            query = "SELECT SEC_ID " \
-                    "FROM sections " \
-                    "WHERE `C_Name` = '{course_name}' AND `D_Name` = '{degree_name}' AND `Semester` = '{semester}' AND `section_identifier` = '{section}'"
+            value_tuple = tuple(value)  # Convert list to tuple
 
-            formatted_query = query.format(course_name=value[0], degree_name=value[1], semester=value[2], section=value[3])
-            cursor.execute(formatted_query)
-            section = cursor.fetchone()
-            section_list.append(section)
+            if value_tuple in occurred_values:
+                index = formatted_slots.index(value)
+                section_list.append(section_list[index])
+
+            else:
+                query = "SELECT SEC_ID " \
+                        "FROM sections " \
+                        "WHERE `C_Name` = '{course_name}' AND `D_Name` = '{degree_name}' AND `Semester` = '{semester}' AND `section_identifier` = '{section}'"
+
+                formatted_query = query.format(course_name=value[0], degree_name=value[1], semester=value[2],
+                                               section=value[3])
+                cursor.execute(formatted_query)
+                section = cursor.fetchone()
+                section_list.append(section)
+
+            occurred_values.add(value_tuple)  # Add the tuple to the set
 
         else:
             section_list.append(value)
+
+
 
     conn.close()
 
@@ -254,4 +271,76 @@ def getSectionByDetails(formatted_slots):
     return section_list
 
 
-# def markAttendance(venues, section_list)
+def setAttendanceToDb(section, attendance):
+
+    conn = dbc.connect_db()
+    cursor = conn.cursor()
+    for student in attendance:
+        student = 0
+
+
+
+
+
+
+
+
+def markAttendance(venues, section_list):
+    attendance_list = []
+    for section in section_list:
+        if section != 'nan':
+            conn = dbc.connect_db()
+            cursor = conn.cursor()
+
+            query = "SELECT roll_Number " \
+                    "FROM student_course " \
+                    "WHERE SEC_ID = {Sec_id}"
+
+            formatted_query = query.format(Sec_id=section)
+            cursor.execute(formatted_query)
+            roll_numbers = cursor.fetchall()
+
+            conn.close()
+
+            venue = venues[section_list.index(section)]
+            venue = venue[0] + '_' + venue[1]
+
+            if len(roll_numbers) != 0 :
+                roll_numbers = [str(item) for item in roll_numbers]
+                roll_numbers = [rn.replace('(', '').replace(')', '').replace(',', '') for rn in roll_numbers]
+
+                attendance, duration = am.markClassAttendance(venue, roll_numbers)
+                attendance_list.append(attendance)
+
+
+            else:
+                attendance_list.append(rcm.no_student_in_section_message)
+
+        else:
+            attendance_list.append(section)
+
+    return attendance_list
+
+
+def getSlotTime(slot):
+    timetable = getTodayTimetable()
+
+    class_time = timetable[slot].tolist()[0]
+    class_time = class_time.split("-")
+    class_time = class_time[0]
+
+    if ':' in class_time:
+        time_format = "%H:%M"
+    else:
+        time_format = "%H"
+
+    # Append current date to the time string
+    datetime_string = datetime.now().strftime("%Y-%m-%d") + " " + class_time
+
+    # Parse the datetime string
+    datetime_obj = datetime.strptime(datetime_string, "%Y-%m-%d " + time_format)
+
+    # Extract the time component
+    converted_time = datetime_obj.time()
+
+    return converted_time

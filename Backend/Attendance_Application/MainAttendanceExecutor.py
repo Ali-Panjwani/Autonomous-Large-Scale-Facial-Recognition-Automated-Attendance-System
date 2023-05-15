@@ -2,6 +2,7 @@ import TimetableFunctions as tf
 from datetime import datetime, timedelta
 import time
 
+
 test = 1
 timetable = tf.getTodayTimetable()
 start_time = tf.todayStartTime()
@@ -13,9 +14,13 @@ time_difference = datetime.combine(datetime.today(), start_time) - datetime.comb
 
 if test == 0:
     if time_difference > timedelta(seconds=0):
-        time.sleep(time_difference.total_seconds() + 120)
+        time.sleep(time_difference.total_seconds() + 300)
 
 slot = 1
+print(tf.getSlotTime(1))
 section_details_list = tf.getSectionsOfSlot(1)
 section_list = tf.getSectionByDetails(section_details_list)
-print(section_list)
+
+attendance_list = tf.markAttendance(venues, section_list)
+
+
