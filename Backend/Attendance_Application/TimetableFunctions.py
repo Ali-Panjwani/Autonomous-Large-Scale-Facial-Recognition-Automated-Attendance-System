@@ -534,8 +534,8 @@ def send_all_parents_email():
 
     emails_not_sent = []
 
-    sender_email = "k190365@nu.edu.pk"  # Replace with your email address
-    sender_password = "yfzkz346yfzkz"  # Replace with your email password
+    sender_email = ""  # Replace with your email address
+    sender_password = ""  # Replace with your email password
 
 
 
