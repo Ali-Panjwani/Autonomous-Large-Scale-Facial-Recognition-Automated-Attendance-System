@@ -48,7 +48,7 @@ while date.today() != end_date:
         all_students_list = []
         attendance_list = []
 
-        venues = [['A1', 'EE']]
+        venues = [['A-1', 'EE']]
         section_list = ['4']
 
         for i in range(2):
@@ -67,4 +67,7 @@ while date.today() != end_date:
 
         attendance_to_db = tf.setAttendanceToDb(['4'], attendance_list, all_students_list)
         print(attendance_to_db)
+
+        break
+
 

@@ -23,6 +23,9 @@ def markClassAttendance(venue, AllStudentsList):
     # Load the test image
     test_img = cv2.imread(test_img_location, cv2.IMREAD_GRAYSCALE)
 
+
+
+
     knn = KNeighborsClassifier()
 
     # Detect all faces in the test image
