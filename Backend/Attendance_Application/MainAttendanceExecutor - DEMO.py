@@ -35,7 +35,7 @@ while date.today() != end_date:
         class_time_difference = datetime.combine(datetime.today(), tf.getSlotStartTime(slot)) - datetime.combine(datetime.today(), datetime.now().time())
         print(class_time_difference)
 
-        if class_time_difference > timedelta(seconds=0):
+        if class_time_difference > timedelta(seconds=0) and test == 0:
             time.sleep(class_time_difference.total_seconds() + 300)
 
         print(tf.getSlotStartTime(slot))
@@ -48,8 +48,11 @@ while date.today() != end_date:
         all_students_list = []
         attendance_list = []
 
+        venues = [['A1', 'EE']]
+        section_list = ['4']
+
         for i in range(2):
-            #attendance_list, all_students_list = tf.markAttendance(venues, section_list)
+            # attendance_list, all_students_list = tf.markAttendance(venues, section_list)
             attendance_list_tmp, all_students_list, duration_list = tf.markAttendance(venues, section_list)
             print(attendance_list)
             print(all_students_list)
@@ -58,14 +61,10 @@ while date.today() != end_date:
             attendance_list = tf.concatenate_lists(attendance_list, attendance_list_tmp)
 
             intermediate_time_difference = datetime.combine(datetime.today(), tf.getSlotEndTime(slot)) - datetime.combine(datetime.today(), datetime.now().time())
-            if intermediate_time_difference > timedelta(seconds=0):
+            if intermediate_time_difference > timedelta(seconds=0) and test == 0:
                 time.sleep(intermediate_time_difference.total_seconds() + 300)
 
 
-
-        attendance_to_db = tf.setAttendanceToDb(venues, attendance_list, all_students_list)
+        attendance_to_db = tf.setAttendanceToDb(['4'], attendance_list, all_students_list)
         print(attendance_to_db)
-
-
-
 

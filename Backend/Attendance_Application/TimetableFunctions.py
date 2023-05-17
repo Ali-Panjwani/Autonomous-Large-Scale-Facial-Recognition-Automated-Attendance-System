@@ -2,7 +2,7 @@ import pandas as pd
 import re
 import os
 import Backend.dbconnector as dbc
-from datetime import datetime, time
+from datetime import datetime, time, date
 import AttendanceMarker as am
 import Backend.reasonCodeAndMessages as rcm
 
@@ -271,22 +271,40 @@ def getSectionByDetails(formatted_slots):
     return section_list
 
 
-def setAttendanceToDb(section, attendance):
+def setAttendanceToDb(section_list, attendance_list, all_students_list):
 
     conn = dbc.connect_db()
     cursor = conn.cursor()
-    for student in attendance:
-        student = 0
+
+    today_date = date.today()
+
+    for section in section_list:
+        for student_list in all_students_list:
+            for student in student_list:
+                if section != 'nan':
+
+                    if any(student in sublist for sublist in attendance_list) :
+                        is_present = 'P'
+                    else:
+                        is_present = 'A'
 
 
+                    query = "INSERT INTO attendance (`id`, `date`, `roll_Number`, `SEC_ID`, `is_present`) " \
+                            "VALUES ('','{today_date}','{roll_number}','{section_id}','{is_present}')"
 
+                    formatted_query = query.format(today_date= today_date, roll_number=student, section_id= section, is_present=is_present)
+                    cursor.execute(formatted_query)
 
+    conn.commit()
+    conn.close()
 
-
+    return 1
 
 
 def markAttendance(venues, section_list):
     attendance_list = []
+    roll_numbers_list = []
+    duration_list = []
     for section in section_list:
         if section != 'nan':
             conn = dbc.connect_db()
@@ -306,23 +324,28 @@ def markAttendance(venues, section_list):
             venue = venue[0] + '_' + venue[1]
 
             if len(roll_numbers) != 0 :
-                roll_numbers = [str(item) for item in roll_numbers]
-                roll_numbers = [rn.replace('(', '').replace(')', '').replace(',', '') for rn in roll_numbers]
+                roll_numbers = [str(rn).strip("(),'") for rn in roll_numbers]
 
                 attendance, duration = am.markClassAttendance(venue, roll_numbers)
                 attendance_list.append(attendance)
+                roll_numbers_list.append(roll_numbers)
+                duration_list.append(duration)
 
 
             else:
                 attendance_list.append(rcm.no_student_in_section_message)
+                roll_numbers_list.append(rcm.no_student_in_section_message)
+                duration_list.append('nan')
 
         else:
             attendance_list.append(section)
+            roll_numbers_list.append(section)
+            duration_list.append(section)
 
-    return attendance_list
+    return attendance_list, roll_numbers_list, duration_list
 
 
-def getSlotTime(slot):
+def getSlotStartTime(slot):
     timetable = getTodayTimetable()
 
     class_time = timetable[slot].tolist()[0]
@@ -341,6 +364,47 @@ def getSlotTime(slot):
     datetime_obj = datetime.strptime(datetime_string, "%Y-%m-%d " + time_format)
 
     # Extract the time component
-    converted_time = datetime_obj.time()
+    converted_start_time = datetime_obj.time()
 
-    return converted_time
+    return converted_start_time
+
+def getSlotEndTime(slot):
+    timetable = getTodayTimetable()
+
+    class_time = timetable[slot].tolist()[0]
+    class_time = class_time.split("-")
+    class_time = class_time[1]
+
+    if ':' in class_time:
+        time_format = "%H:%M"
+    else:
+        time_format = "%H"
+
+    # Append current date to the time string
+    datetime_string = datetime.now().strftime("%Y-%m-%d") + " " + class_time
+
+    # Parse the datetime string
+    datetime_obj = datetime.strptime(datetime_string, "%Y-%m-%d " + time_format)
+
+    # Extract the time component
+    converted_end_time = datetime_obj.time()
+
+    return converted_end_time
+
+
+def concatenate_lists(*args):
+    new_list = []
+    index = 0
+
+    while True:
+        sublist_s = [lst[index] for lst in args if index < len(lst)]
+
+        if not sublist_s:
+            break
+
+        unique_values = list(set(sum(sublist_s, [])))
+        new_list.append(unique_values)
+
+        index += 1
+
+    return new_list

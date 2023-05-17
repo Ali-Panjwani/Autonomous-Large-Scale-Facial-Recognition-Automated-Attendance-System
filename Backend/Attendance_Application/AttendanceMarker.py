@@ -19,8 +19,9 @@ def markClassAttendance(venue, AllStudentsList):
 
     facematrix = np.array([img.flatten() for img in images])
 
+    test_img_location = 'E:\\Repository\\FYP\\Backend\\Attendance_Application\\Class_Cams\\' + venue + '\\class.jpg'
     # Load the test image
-    test_img = cv2.imread(".\\Class_Cams\\" + venue, cv2.IMREAD_GRAYSCALE)
+    test_img = cv2.imread(test_img_location, cv2.IMREAD_GRAYSCALE)
 
     knn = KNeighborsClassifier()
 
@@ -35,7 +36,8 @@ def markClassAttendance(venue, AllStudentsList):
     for i in range(3):
 
         # Transform face-matrix to new reduced feature space
-        pca = PCA(n_components=AttFunc.getOptimalComponentsCount(facematrix))
+        #pca = PCA(n_components=AttFunc.getOptimalComponentsCount(facematrix))
+        pca = PCA()
 
         if i == 1:
             pca = PCA(n_components=int(AttFunc.getOptimalComponentsCount(facematrix) - (len(facelabels) * 0.1)))
@@ -44,7 +46,7 @@ def markClassAttendance(venue, AllStudentsList):
             pca = PCA(n_components=int(AttFunc.getOptimalComponentsCount(facematrix)))
 
         if i == 3:
-            pca = PCA(n_components=int(AttFunc.getOptiomalComponentsCount(facematrix) + (len(facelabels) * 0.1)))
+            pca = PCA(n_components=int(AttFunc.getOptimalComponentsCount(facematrix) + (len(facelabels) * 0.1)))
 
         facematrix_reduced = pca.fit_transform(facematrix)
 
@@ -77,11 +79,11 @@ def markClassAttendance(venue, AllStudentsList):
             cv2.destroyAllWindows()
 
         # print(knn.predict(test_face_vectors))
-        predictions = np.concatenate((predictions, knn.predict(test_face_vectors)))
+        predictions = np.concatenate((predictions, knn.predict(test_face_vectors)),axis=0)
 
     # print(predictions)
     # Count the number of unique labels in the predictions
-    predictions = np.array(list(set(predictions)))
+    predictions = (list(set(predictions)))
     # print(predictions)
 
     end = time.time()
