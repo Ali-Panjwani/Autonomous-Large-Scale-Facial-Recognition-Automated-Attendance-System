@@ -1,10 +1,17 @@
+import ssl
+from email.mime.multipart import MIMEMultipart
+
 import pandas as pd
 import re
 import os
 import Backend.dbconnector as dbc
-from datetime import datetime, time, date
+from datetime import datetime, time, date, timedelta
 import AttendanceMarker as am
 import Backend.reasonCodeAndMessages as rcm
+import smtplib
+import Backend.Student_Application.GetStudentInfo as sInfo
+from tabulate import tabulate
+from email.mime.text import MIMEText
 
 test = 1
 
@@ -408,3 +415,150 @@ def concatenate_lists(*args):
         index += 1
 
     return new_list
+
+def is_last_date_of_month():
+    today = date.today()
+    if test == 1:
+        today = datetime(2023, 5, 31).date()
+        formatted_date = today.strftime("%d %B %Y")
+        today = datetime.strptime(formatted_date, "%d %B %Y").date()
+
+    next_month = today.replace(day=28) + timedelta(days=4)  # Get the date of the next month
+    last_date_of_month = next_month - timedelta(days=next_month.day)
+    return today == last_date_of_month
+
+def make_message(roll_number):
+    course_info_func_response = sInfo.getStudentCourses(roll_number)
+
+    course_info_table = []
+
+    for course in course_info_func_response:
+        course_info = course['courseInfo']
+        row = [course['course'], course_info['c_id'], course_info['name'], course_info['credit'], course_info['hours'],
+               course['degree'], course['instructor'], course['section'], course['semester']]
+        course_info_table.append(row)
+
+    course_info_header = ['Course', 'Course ID', 'Course Name', 'Credit', 'Hours', 'Degree', 'Instructor', 'Section', 'Semester']
+    course_info_table_form = tabulate(course_info_table, course_info_header, tablefmt='html')
+
+    attendance_info_func_response = sInfo.getStudentAttendance(roll_number)
+
+    attendance_info_table = []
+
+    for course, details in attendance_info_func_response.items():
+        if isinstance(details, dict):
+            row = [course, details['reasonMessage']]
+            attendance_info_table.append(row)
+        else:
+            for detail in details:
+                row = [course, detail['date'], detail['is_present']]
+                attendance_info_table.append(row)
+
+    attendance_info_headers = ['Course', 'Date', 'Presence']
+    attendance_info_table_form = tabulate(attendance_info_table, attendance_info_headers, tablefmt='html')
+
+    attendance_summary = {}
+
+    for course, details in attendance_info_func_response.items():
+        if isinstance(details, dict):
+            # Skip courses with no attendance
+            continue
+
+        attendance_summary[course] = {"P": 0, "A": 0}
+        for detail in details:
+            presence = detail['is_present']
+            attendance_summary[course][presence] += 1
+
+    attendance_summary_table = []
+    for course, counts in attendance_summary.items():
+        row = [course, counts['P'], counts['A']]
+        attendance_summary_table.append(row)
+
+    attendance_summary_headers = ['Course', 'Total Presents', 'Total Absents']
+    attendance_summary_table_form = tabulate(attendance_summary_table, attendance_summary_headers, tablefmt='html')
+
+    final_message = f"""
+    <html>
+    <body>
+    <p>Dear Parent,</p>
+    <p>I hope this email finds you well. As the semester is in progress, we wanted to provide you with an update on your child's progress at FAST-NUCES. We appreciate your continued support in their academic journey.</p>
+
+    <h3>Enrolled Courses:</h3>
+    <p>We are pleased to inform you that your child is currently enrolled in the following courses for the current semester:</p>
+
+    {course_info_table_form}
+
+    <h3>Attendance:</h3>
+    <p>We are pleased to inform you that this is your child's current attendance report in the following courses for the current semester:</p>
+
+    {attendance_info_table_form}
+
+    <h3>Attendance Summary:</h3>
+    {attendance_summary_table_form}
+
+    <p>Please note that attendance information is an important indicator of a student's engagement in the learning process. We encourage your child to maintain regular attendance and actively participate in their classes to maximize their academic potential.</p>
+
+    <p>If you have any concerns or questions regarding your child's enrolled courses or attendance, please do not hesitate to reach out to the respective course instructors or academic advisors. They will be more than happy to provide further guidance and support.</p>
+
+    <p>Thank you for your continued partnership in your child's education. We believe that by working together, we can ensure their success at [University Name]. We wish them the best for the remainder of the semester.</p>
+
+    <p>Sincerely,</p>
+    <p>FAST - National University of Computer and Emerging Sciences</p>
+
+    <p>Note: This report is computer-generated and may be subject to limitations and discrepancies. Please review it accordingly.</p>
+    </body>
+    </html>
+    """
+
+    return final_message
+
+def send_all_parents_email():
+    conn = dbc.connect_db()
+    cursor = conn.cursor()
+
+    query = "SELECT roll_Number FROM parent_email"
+
+    cursor.execute(query)
+    roll_numbers = cursor.fetchall()
+
+    roll_numbers = [str(rn).strip("(),'") for rn in roll_numbers]
+
+    query = "SELECT parent_email FROM parent_email"
+
+    cursor.execute(query)
+    parent_emails = cursor.fetchall()
+
+    parent_emails = [str(rn).strip("(),'") for rn in parent_emails]
+
+    conn.close()
+
+    emails_not_sent = []
+
+    sender_email = "k190365@nu.edu.pk"  # Replace with your email address
+    sender_password = "yfzkz346yfzkz"  # Replace with your email password
+
+
+
+    for roll_number, parent_email in zip(roll_numbers, parent_emails):
+        email_subject = "Attendance Report of " + roll_number
+        message = MIMEMultipart()
+        message.attach(MIMEText(make_message(roll_number), 'html'))
+
+        message['From'] = sender_email
+        message['To'] = parent_email
+        message['Subject'] = email_subject
+
+        # Create a secure SSL context
+        context = ssl.create_default_context()
+
+        try:
+            with smtplib.SMTP("smtp.gmail.com", 587) as server:
+                server.starttls(context=context)
+                server.login(sender_email, sender_password)
+                server.send_message(message)
+        except Exception as e:
+            print(f"Failed to send email to parent with email address: {parent_email}")
+            emails_not_sent.append((roll_number, parent_email))
+
+
+

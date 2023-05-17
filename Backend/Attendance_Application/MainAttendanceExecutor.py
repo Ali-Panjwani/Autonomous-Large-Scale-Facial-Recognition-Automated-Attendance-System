@@ -67,5 +67,9 @@ while date.today() != end_date:
         print(attendance_to_db)
 
 
+        if tf.is_last_date_of_month():
+            tf.send_all_parents_email()
 
 
+
+        break
